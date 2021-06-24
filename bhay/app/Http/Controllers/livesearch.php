@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use DB;
+
+class LiveSearch extends Controller
+{
+    function index()
+    {
+     return view('live_search');
+    }
+
+    function action(Request $request)
+    {
+     if($request->ajax())
+     {
+      $output = '';
+      $query = $request->get('query');
+      if($query != '')
+      {
+       $data = DB::table('surat_visum')
+       ->join('surat_instansi','surat_instansi.kd','=','surat_visum.kd_instansi')
+       ->join('reg_periksa','reg_periksa.no_rawat','=','surat_visum.no_rawat')
+       ->join('pasien','reg_periksa.no_rkm_medis','=','pasien.no_rkm_medis') 
+       ->join('dokter','dokter.kd_dokter','=','reg_periksa.kd_dokter')
+       ->whereBetween('surat_visum.tanggalsurat', ['2020-01-01','2021-12-31'])
+       ->select('surat_visum.no_surat','surat_visum.no_rawat','surat_instansi.instansi','surat_visum.status','pasien.nm_pasien',
+       'surat_visum.kategori','dokter.nm_dokter')
+         ->where('surat_visum.no_surat', 'like', '%'.$query.'%')
+         ->orWhere('surat_visum.no_rawat', 'like', '%'.$query.'%')
+         ->orWhere('surat_instansi.instansi', 'like', '%'.$query.'%')
+         ->orWhere('surat_visum.status', 'like', '%'.$query.'%')
+         ->orWhere('pasien.nm_pasien', 'like', '%'.$query.'%')
+         ->orWhere('surat_visum.kategori', 'like', '%'.$query.'%')
+         ->orWhere('dokter.nm_dokter', 'like', '%'.$query.'%')
+         ->orderBy('surat_visum.no_surat', 'desc')
+         ->get();
+         
+      }
+      else
+      {
+       $data = DB::table('surat_visum')
+         ->orderBy('surat_visum.no_surat', 'desc')
+         ->get();
+      }
+      $total_row = $data->count();
+      if($total_row > 0)
+      {
+       foreach($data as $row)
+       {
+        $output .= '
+        <tr>
+         <td>'.$row->no_surat.'</td>
+         <td>'.$row->no_rawat.'</td>
+         <td>'.$row->instansi.'</td>
+         <td>'.$row->status.'</td>
+         <td>'.$row->kategori.'</td>
+         <td>'.$row->nm_dokter.'</td>
+         <td>'.$row->no_surat.'</td>
+        </tr>
+        ';
+       }
+      }
+      else
+      {
+       $output = '
+       <tr>
+        <td align="center" colspan="5">No Data Found</td>
+       </tr>
+       ';
+      }
+      $data = array(
+       'table_data'  => $output,
+       'total_data'  => $total_row
+      );
+
+      echo json_encode($data);
+     }
+    }
+}
