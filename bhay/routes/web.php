@@ -19,9 +19,10 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', [\App\Http\Controllers\Surat::class, 'index']);
-Route::get('/surat/{param}', [App\Http\Controllers\Surat::class,'index'])->name('surat');
+Route::get('/surat/{param}/{search}', [App\Http\Controllers\Surat::class,'cari'])->name('surat');
 Route::get('/live_search', 'LiveSearch@index');
 Route::get('/live_search/action', 'LiveSearch@action')->name('live_search.action');
+Route::post('search', 'App\Http\Controllers\surat@searchDate')->name('main');
 
 // Route::get('/search', [Surat::class, 'search'])->name('search');
 //Route::get('/search', [App\Http\Controllers\Surat::class,'search'])->name('search');

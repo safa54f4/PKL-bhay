@@ -17,6 +17,7 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 </head>
 <body>
+<form action="searchDate" method="POST"></form>
     
     <script src="{{ asset('style/assets/js/vendor/jquery-2.1.4.min.js') }}"></script>
     <script src="{{ asset('style/assets/js/popper.min.js') }}"></script>
@@ -50,26 +51,45 @@
                         <div class="card-header">
                             <strong class="card-title">Status Visum Anda</strong>
                         </div>
-                        <div class="col-md-4">
-                  <label></label>
-                  <select id="filter" name="filter" class="form-control filter" onchange="filter()">
-                    <option value="Semua" selected>Filter Status</option>
+                        <div class="card-body">
+                 <div class="col-md-4">
+                  <select id="filter" name="filter" class="form-control filter">
+    
                     <option value="Semua">All</option>
                     <option value="Selesai">Selesai</option>
                     <option value="Dalam_Proses">Dalam Proses</option>
                   </select>
-                 <br/>
+                  <button class="btn btn-primary" id="buttonFilter" onclick="filter()">Cari</button>
+                 
                 </div>
-                <div class="breadcrumbs">
-   <!-- <h3 align="center">Live search in laravel using AJAX</h3><br /> -->
-   <div class="panel panel-default">
-    <!-- <div class="panel-heading">Search</div> -->
-    <div class="panel-body">
+                </div>
+                
+   <div class="card-body">
+    <div class="col-md-4">
      <div class="form-group">
+     <div class="pull-right">
       <input type="text" name="search" id="search" class="form-control" placeholder="Search " />
      </div>
+    </div>
+   </div>
+   </div>
+   <div class="card-body">
+    <div class="col-md-4">
+    <label for="date" class="col-from-label col-sm-4"></label>
+    <div class="col-sm-4">
+    <input type="date" class="form-control input-sm" id="fromDate" name="fromDate" required/>
+   
+    <label for="date" class="col-from-label col-sm-4"></label>
+    <input type="date" class="form-control input-sm" id="toDate" name="toDate" required/>
+    </div>
+</div>
+<div class="col-md-4">
+<button type="submit" class="btn" name="search" title="Search"><img src="https://img.icons8.com/android/search">
+</div>
+</div>
      <br />
-            <div class="card-body">
+     
+            <!-- <div class="card-body">
                 <div class="col-md-4">
                     <input type="text" name="from_date" id="from_date" class="form-control" placeholder="From Date" readonly />
                 </div>
@@ -80,7 +100,7 @@
                     <button type="button" name="filter" id="filter" class="btn btn-primary">Filter</button>
                     <button type="button" name="refresh" id="refresh" class="btn btn-default">Refresh</button>
                 </div>
-            </div>
+            </div> -->
             <br />
                         <div class="card-body">
                   <table id="bootstrap-data-table" class="table table-striped table-bordered">
@@ -110,9 +130,20 @@
                         <td>{{$item->instansi}}</td>
                         <td>{{$item->status}}</td>
                       </tr>
+                      
                  @endforeach
                     </tbody>
+                    
                   </table>
+                 <div class="pull-right"> 
+                 Halaman : {{ $surat->currentPage() }} <br/>
+                Jumlah Data : {{ $surat->total() }} <br/>
+                Data Per Halaman : {{ $surat->perPage() }} <br/>
+                <br/>
+                 {{ $surat->links() }} </div>
+    </div>
+                  <br/>
+	
                   
                         </div>
                     </div>
@@ -131,36 +162,40 @@
 <script>
     function filter(){
         var x = document.getElementById("filter").value;
-        window.location.replace('http://localhost:8000/surat/'+ x);
+        var y = document.getElementById("search").value;
+        if(y == ''){
+            y = 'all';
+        }
+        window.location.replace('http://localhost:8000/surat/'+ x +'/' + y);
     }
 </script>
 
 
 <script>
-$(document).ready(function(){
+// $(document).ready(function(){
 
- fetch_surat_data();
+//  fetch_surat_data();
 
- function fetch_surat_data(query = '')
- {
-  $.ajax({
-   url:"{{ route('live_search.action') }}",
-   method:'GET',
-   data:{query:query},
-   dataType:'json',
-   success:function(data)
-   {
-    $('tbody').html(data.table_data);
-    $('#total_records').text(data.total_data);
-   }
-  })
- }
+//  function fetch_surat_data(query = '')
+//  {
+//   $.ajax({
+//    url:"{{ route('live_search.action') }}",
+//    method:'GET',
+//    data:{query:query},
+//    dataType:'json',
+//    success:function(data)
+//    {
+//     $('tbody').html(data.table_data);
+//     $('#total_records').text(data.total_data);
+//    }
+//   })
+//  }
 
- $(document).on('keyup', '#search', function(){
-  var query = $(this).val();
-  fetch_surat_data(query);
- });
-});
+//  $(document).on('keyup', '#search', function(){
+//   var query = $(this).val();
+//   fetch_surat_data(query);
+//  });
+// });
 </script>
 
 </body>

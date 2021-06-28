@@ -3,10 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Expr\AssignOp\Div;
 
 class LiveSearch extends Controller
 {
+  public function up()
+{
+  DB::statement(
+    "CREATE OR REPLACE VIEW search_views AS
+  	 SELECT title, 'books' 
+  	 FROM books
+  	 UNION ALL
+  	 SELECT title, 'games'
+  	 FROM games
+  	 UNION ALL
+  	 SELECT title, 'movies'
+  	 FROM movies;"
+  );
+}
     function index()
     {
      return view('live_search');
@@ -36,7 +51,8 @@ class LiveSearch extends Controller
          ->orWhere('surat_visum.kategori', 'like', '%'.$query.'%')
          ->orWhere('dokter.nm_dokter', 'like', '%'.$query.'%')
          ->orderBy('surat_visum.no_surat', 'desc')
-         ->get();
+        
+         ->paginate(10);
          
       }
       else
@@ -80,3 +96,4 @@ class LiveSearch extends Controller
      }
     }
 }
+
